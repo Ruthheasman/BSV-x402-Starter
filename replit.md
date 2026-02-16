@@ -45,6 +45,7 @@ shared/
 
 ## Environment Variables
 - `SERVER_PRIVATE_KEY` - BSV private key (hex-encoded or WIF format) for wallet (optional, runs in demo mode without it)
+- `ADMIN_PASSWORD` - Password for accessing the /admin dashboard (optional, admin is open without it)
 - `SERVICE_NAME` - Custom service name (default: "bsv-x402-starter")
 
 ## How It Works

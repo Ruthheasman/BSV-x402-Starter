@@ -720,6 +720,12 @@ export default function Dashboard() {
                 Guide
               </Button>
             </Link>
+            <Link href="/admin">
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs" data-testid="link-admin">
+                <Activity className="w-3.5 h-3.5" />
+                Admin
+              </Button>
+            </Link>
             <StatusIndicator status={data?.status || (isLoading ? "loading" : "offline")} />
             <ThemeToggle />
           </div>
