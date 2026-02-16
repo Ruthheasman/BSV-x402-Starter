@@ -44,7 +44,7 @@ shared/
 - **server/middleware/payment-setup.ts** - BSV auth + payment middleware chain.
 
 ## Environment Variables
-- `SERVER_PRIVATE_KEY` - Hex-encoded BSV private key for wallet (optional, runs in demo mode without it)
+- `SERVER_PRIVATE_KEY` - BSV private key (hex-encoded or WIF format) for wallet (optional, runs in demo mode without it)
 - `SERVICE_NAME` - Custom service name (default: "bsv-x402-starter")
 
 ## How It Works
@@ -57,9 +57,15 @@ shared/
 ## Running
 `npm run dev` starts both the Express backend and Vite frontend on port 5000.
 
+## Pages
+- `/` - Main dashboard with hero, stats, endpoint cards, payment flow visualization, architecture diagram, quickstart
+- `/guide` - Integration guide: 6-step walkthrough for adding BSV payments to existing apps
+
 ## Recent Changes
 - Initial implementation: Feb 2026
 - BSV auth + payment middleware with config-driven pricing
 - Dashboard with endpoint cards, payment flow, architecture visualization
 - Discovery endpoint at /.well-known/x402-info
 - Example endpoints across 3 pricing tiers (micro, standard, premium)
+- Integration guide page at /guide
+- Wallet supports both hex-encoded and WIF format private keys

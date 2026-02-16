@@ -110,13 +110,22 @@ export default function Guide() {
               code={`import { PrivateKey } from '@bsv/sdk'
 
 const key = PrivateKey.fromRandom()
-console.log(key.toHex())
-// e.g. "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"`}
+
+// Either format works as SERVER_PRIVATE_KEY:
+console.log('WIF:', key.toWif())     // e.g. "L1F1c..."
+console.log('Hex:', key.toHex())     // e.g. "e3b0c4..."
+console.log('Address:', key.toAddress())`}
             />
             <p>
-              Copy the hex output and set it as the <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">SERVER_PRIVATE_KEY</code> environment
-              variable in your Replit project (via the Secrets tab). This enables BRC-103/104 authentication and BRC-29/105 payments.
+              Copy the WIF or hex output and set it as the <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">SERVER_PRIVATE_KEY</code> environment
+              variable in your Replit project (via the Secrets tab). Both formats are supported. This enables BRC-103/104 authentication and BRC-29/105 payments.
             </p>
+            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 flex gap-2">
+              <Key className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              <span className="text-red-700 dark:text-red-300 text-xs">
+                Never commit your private key to source control. Always use Replit Secrets (or environment variables) to store it securely.
+              </span>
+            </div>
             <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 flex gap-2">
               <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span className="text-amber-700 dark:text-amber-300 text-xs">
