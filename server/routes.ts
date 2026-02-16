@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import {
   setupMiddleware,
@@ -66,9 +66,9 @@ export async function registerRoutes(
       },
       refunds: {
         supported: true,
-        automatic: true,
+        policy: "manual-on-failure",
         description:
-          "Automatic refund if service fails after payment",
+          "If a handler fails after payment, the error response includes refund eligibility details (amount and sender key). Refunds are logged server-side and processed manually by the operator.",
       },
     };
 
@@ -90,6 +90,70 @@ export async function registerRoutes(
     });
   });
 
+  function wrapWithRefund(handlerFn: (req: Request, res: Response) => void) {
+    return async (req: Request, res: Response) => {
+      const payment = (req as any).payment;
+      const satoshisPaid = payment?.satoshisPaid || 0;
+      const senderKey = (req as any).auth?.identityKey;
+
+      const originalJson = res.json.bind(res);
+      let responseStatusCode = 200;
+
+      const originalStatus = res.status.bind(res);
+      res.status = (code: number) => {
+        responseStatusCode = code;
+        return originalStatus(code);
+      };
+
+      res.json = ((body: any) => {
+        if (responseStatusCode >= 400 && satoshisPaid > 0) {
+          console.log(
+            `[refund] Handler returned ${responseStatusCode} after payment of ${satoshisPaid} sats to ${senderKey || "unknown"}`
+          );
+          if (body && typeof body === "object") {
+            body.refund = {
+              status: "eligible",
+              satoshis: satoshisPaid,
+              senderIdentityKey: senderKey || null,
+            };
+          }
+        }
+        return originalJson(body);
+      }) as any;
+
+      try {
+        await Promise.resolve(handlerFn(req, res));
+      } catch (error: any) {
+        console.error(
+          `[refund] Handler threw after payment of ${satoshisPaid} sats:`,
+          error.message || error
+        );
+
+        if (satoshisPaid > 0) {
+          console.log(
+            `[refund] Refund eligible: ${satoshisPaid} sats to ${senderKey || "unknown"}`
+          );
+        }
+
+        if (!res.headersSent) {
+          originalStatus(500);
+          originalJson({
+            status: "error",
+            code: "ERR_HANDLER_FAILED",
+            description: error.message || "The service encountered an error processing your request.",
+            refund: satoshisPaid > 0
+              ? {
+                  status: "eligible",
+                  satoshis: satoshisPaid,
+                  senderIdentityKey: senderKey || null,
+                }
+              : undefined,
+          });
+        }
+      }
+    };
+  }
+
   for (const endpoint of endpoints) {
     const handler = handlers[endpoint.handler];
     if (!handler) {
@@ -99,8 +163,9 @@ export async function registerRoutes(
       continue;
     }
 
+    const wrappedHandler = endpoint.price > 0 ? wrapWithRefund(handler) : handler;
     const middlewares =
-      endpoint.price > 0 ? [authMw, paymentMw, handler] : [handler];
+      endpoint.price > 0 ? [authMw, paymentMw, wrappedHandler] : [wrappedHandler];
 
     const method = endpoint.method.toLowerCase() as
       | "get"
