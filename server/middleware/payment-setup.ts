@@ -20,7 +20,7 @@ export async function setupMiddleware() {
       "@bsv/auth-express-middleware"
     );
     authMiddleware = createAuthMiddleware({
-      wallet,
+      wallet: wallet as any,
       allowUnauthenticated: true,
     });
     console.log("[middleware] Auth middleware (BRC-103/104) initialized");
@@ -33,8 +33,8 @@ export async function setupMiddleware() {
       "@bsv/payment-express-middleware"
     );
     paymentMiddleware = createPaymentMiddleware({
-      wallet,
-      calculateRequestPrice: async (req: Request) => {
+      wallet: wallet as any,
+      calculateRequestPrice: async (req: any) => {
         const price = getEndpointPrice(req.path, req.method);
         return price;
       },
