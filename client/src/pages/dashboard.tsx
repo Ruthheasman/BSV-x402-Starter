@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import {
   Shield,
   Zap,
@@ -16,6 +17,7 @@ import {
   Terminal,
   RefreshCw,
   CircleDot,
+  BookOpen,
 } from "lucide-react";
 import { SiBitcoin } from "react-icons/si";
 import { Badge } from "@/components/ui/badge";
@@ -712,6 +714,12 @@ export default function Dashboard() {
             )}
           </div>
           <div className="flex items-center gap-2">
+            <Link href="/guide">
+              <Button variant="ghost" size="sm" className="gap-1.5 text-xs" data-testid="link-guide">
+                <BookOpen className="w-3.5 h-3.5" />
+                Guide
+              </Button>
+            </Link>
             <StatusIndicator status={data?.status || (isLoading ? "loading" : "offline")} />
             <ThemeToggle />
           </div>
