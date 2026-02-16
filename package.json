@@ -11,6 +11,9 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@bsv/auth-express-middleware": "^2.0.2",
+    "@bsv/payment-express-middleware": "^2.0.0",
+    "@bsv/sdk": "^2.0.3",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@radix-ui/react-accordion": "^1.2.4",
